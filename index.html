@@ -100,7 +100,7 @@
   --t1: #E5E3E0;
   --t2: #C8C5C2;
   --t3: #B0ADA9;
-  --t4: #d1cfcc;
+  --t4: #bbbbbb;
   --t5: #504D4A;
 
   --ac:        #C97B54;
@@ -1038,6 +1038,7 @@ body.compare-active .compare-btn {
   <button class="nav-tab" onclick="showSec('careers',this)">🚀 Careers</button>
   <button class="nav-tab" onclick="showSec('scholarships',this)">💰 Scholarships</button>
   <button class="nav-tab" onclick="showSec('calculator',this)">🧮 Cost Calc</button>
+  <button class="nav-tab" onclick="showSec('cgpa',this);initCgpaTable()">📊 CGPA Converter</button>
   <button class="nav-tab" onclick="showSec('checklist',this)">✅ Checklist</button>
   <button class="nav-tab" onclick="showSec('tracker',this);trackerInit()">📌 App Tracker</button>
   <button class="nav-tab" onclick="showSec('jobrec',this)" style="background:linear-gradient(135deg,#c94c0a,#e8960e);color:#fff;font-weight:800">🏆 Best for Jobs</button>
@@ -1172,6 +1173,7 @@ body.compare-active .compare-btn {
         <div class="results-count" id="resultCount">71 programs</div>
         <button class="results-reset-btn" onclick="resetAllFilters()" title="Clear all filters">↺ Reset Filters</button>
         <button class="results-reset-btn" onclick="exportToPDF()" title="Export filtered list to PDF" style="margin-left:0">⬇ Export PDF</button>
+        <button class="results-reset-btn" onclick="printBookmarkComparison()" title="Print bookmarked programs side by side" style="margin-left:0">🖨️ Compare Sheet</button>
         <button class="compare-toggle-btn" id="compareToggle" onclick="toggleCompareMode()" title="Select up to 3 programs to compare side-by-side">⚖️ Compare</button>
       </div>
 
@@ -1469,6 +1471,61 @@ body.compare-active .compare-btn {
 </div>
 
 <!-- ════════════════════════ SECTION: SCHOLARSHIPS (NEW!) ════════════════════════ -->
+<div id="sec-cgpa" class="section">
+<div class="section-page" style="max-width:720px">
+  <div class="sec-hero" data-emoji="📊">
+    <h2>CGPA → German Grade Converter</h2>
+    <p>Convert your Indian CGPA or percentage to the German 1.0–4.0 grading scale and check admission chances across programs.</p>
+  </div>
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:24px 28px;margin-bottom:20px">
+
+    <div style="margin-bottom:18px">
+      <label style="font-size:.82rem;font-weight:700;color:var(--t2);display:block;margin-bottom:8px">Select your grading system</label>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button id="cgpaBtn10" onclick="setCgpaMode('10')" style="padding:7px 16px;border-radius:var(--r-sm);font-size:.8rem;font-weight:700;border:2px solid var(--ac);background:var(--ac);color:#fff;cursor:pointer">10-Point CGPA</button>
+        <button id="cgpaBtn4" onclick="setCgpaMode('4')" style="padding:7px 16px;border-radius:var(--r-sm);font-size:.8rem;font-weight:700;border:2px solid var(--border);background:var(--surface-2);color:var(--t2);cursor:pointer">4-Point GPA</button>
+        <button id="cgpaBtnPct" onclick="setCgpaMode('pct')" style="padding:7px 16px;border-radius:var(--r-sm);font-size:.8rem;font-weight:700;border:2px solid var(--border);background:var(--surface-2);color:var(--t2);cursor:pointer">Percentage %</button>
+      </div>
+    </div>
+
+    <div style="margin-bottom:18px">
+      <label id="cgpaInputLabel" style="font-size:.82rem;font-weight:700;color:var(--t2);display:block;margin-bottom:8px">Enter your CGPA (out of 10)</label>
+      <div style="display:flex;gap:10px;align-items:center">
+        <input id="cgpaInput" type="number" min="0" max="10" step="0.01" placeholder="e.g. 7.5"
+          oninput="calcCgpaConvert()"
+          style="flex:1;padding:11px 14px;border:2px solid var(--border);border-radius:var(--r-sm);background:var(--surface-2);color:var(--t1);font-size:1rem;font-weight:700;outline:none;transition:border .15s"
+          onfocus="this.style.borderColor='var(--ac)'" onblur="this.style.borderColor='var(--border)'">
+        <span id="cgpaInputUnit" style="font-size:.85rem;color:var(--t4);min-width:40px">/ 10</span>
+      </div>
+    </div>
+
+    <div id="cgpaResult" style="display:none">
+      <!-- filled by JS -->
+    </div>
+  </div>
+
+  <!-- Reference Table -->
+  <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px 24px">
+    <div style="font-size:.8rem;font-weight:800;color:var(--t1);margin-bottom:12px">📋 Quick Reference Table (10-Point CGPA)</div>
+    <div style="overflow-x:auto">
+    <table style="width:100%;border-collapse:collapse;font-size:.78rem">
+      <thead>
+        <tr style="background:var(--surface-3)">
+          <th style="padding:8px 10px;text-align:left;color:var(--t3);font-weight:700;border-bottom:2px solid var(--border)">Indian CGPA</th>
+          <th style="padding:8px 10px;text-align:left;color:var(--t3);font-weight:700;border-bottom:2px solid var(--border)">Percentage ~</th>
+          <th style="padding:8px 10px;text-align:left;color:var(--t3);font-weight:700;border-bottom:2px solid var(--border)">German Grade</th>
+          <th style="padding:8px 10px;text-align:left;color:var(--t3);font-weight:700;border-bottom:2px solid var(--border)">German Label</th>
+          <th style="padding:8px 10px;text-align:left;color:var(--t3);font-weight:700;border-bottom:2px solid var(--border)">Admission Outlook</th>
+        </tr>
+      </thead>
+      <tbody id="cgpaRefTable"></tbody>
+    </table>
+    </div>
+    <div style="font-size:.7rem;color:var(--t4);margin-top:10px">⚠️ Formula used: German Grade = 1 + 3×(Max−Score)/(Max−Min) where Min=5.0, Max=10.0. This is the standard modified Bavarian formula used by most German universities and anabin database.</div>
+  </div>
+</div>
+</div>
+
 <div id="sec-tracker" class="section">
 <div class="section-page" style="max-width:900px">
   <div class="sec-hero" data-emoji="📌">
@@ -1494,59 +1551,66 @@ body.compare-active .compare-btn {
     <label style="font-size:.82rem;font-weight:700;color:var(--t2);display:block;margin-bottom:8px">Select City</label>
     <input id="calcCitySearch" type="text" placeholder="🔍 Search city…" oninput="filterCalcCities(this.value)" autocomplete="off" style="width:100%;padding:9px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface-2);color:var(--t1);font-size:.85rem;margin-bottom:8px;box-sizing:border-box">
     <select id="calcCity" onchange="renderCalc()" size="1" style="width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:var(--r-sm);background:var(--surface-2);color:var(--t1);font-size:.88rem;margin-bottom:20px">
-      <option value="munich">Munich (München) 🏙️ High Cost</option>
-      <option value="berlin">Berlin 🏙️ Medium-High</option>
-      <option value="hamburg">Hamburg 🏙️ Medium-High</option>
-      <option value="frankfurt">Frankfurt 🏙️ High Cost</option>
-      <option value="dusseldorf">Düsseldorf 🏙️ Medium-High</option>
-      <option value="cologne">Cologne (Köln) 🏙️ Medium</option>
-      <option value="stuttgart">Stuttgart 🏙️ Medium-High</option>
-      <option value="dortmund">Dortmund 🏙️ Medium</option>
-      <option value="dresden">Dresden 🏙️ Low-Medium</option>
-      <option value="duisburg">Duisburg 🏙️ Low-Medium</option>
-      <option value="nuremberg">Nuremberg / Erlangen 🏙️ Medium</option>
-      <option value="karlsruhe">Karlsruhe 🏙️ Medium</option>
-      <option value="darmstadt">Darmstadt 🏙️ Medium</option>
-      <option value="wiesbaden">Wiesbaden 🏙️ Medium-High</option>
-      <option value="mannheim">Mannheim 🏙️ Medium</option>
       <option value="aachen">Aachen 🏙️ Low-Medium</option>
-      <option value="bonn">Bonn 🏙️ Medium</option>
-      <option value="siegen">Siegen 🏙️ Low</option>
-      <option value="paderborn">Paderborn 🏙️ Low-Medium</option>
-      <option value="marburg">Marburg 🏙️ Low-Medium</option>
-      <option value="kaiserslautern">Kaiserslautern 🏙️ Low</option>
-      <option value="koblenz">Koblenz 🏙️ Low-Medium</option>
-      <option value="augsburg">Augsburg 🏙️ Low-Medium</option>
-      <option value="ingolstadt">Ingolstadt 🏙️ Medium</option>
-      <option value="neuulm">Neu-Ulm / Ulm 🏙️ Low-Medium</option>
-      <option value="wuerzburg">Würzburg 🏙️ Low-Medium</option>
-      <option value="erlangen">Erlangen 🏙️ Low-Medium</option>
       <option value="aalen">Aalen 🏙️ Low</option>
       <option value="albstadt">Albstadt 🏙️ Low</option>
       <option value="amberg">Amberg / Weiden 🏙️ Low</option>
-      <option value="deggendorf">Deggendorf 🏙️ Low</option>
+      <option value="augsburg">Augsburg 🏙️ Low-Medium</option>
       <option value="bamberg">Bamberg 🏙️ Low</option>
+      <option value="berlin">Berlin 🏙️ Medium-High</option>
+      <option value="bielefeld">Bielefeld 🏙️ Low</option>
       <option value="bingen">Bingen am Rhein 🏙️ Low</option>
+      <option value="bonn">Bonn 🏙️ Medium</option>
       <option value="chemnitz">Chemnitz 🏙️ Low</option>
+      <option value="clausthal">Clausthal-Zellerfeld 🏙️ Very Low</option>
+      <option value="cologne">Cologne (Köln) 🏙️ Medium</option>
+      <option value="cottbus">Cottbus 🏙️ Very Low</option>
+      <option value="darmstadt">Darmstadt 🏙️ Medium</option>
+      <option value="deggendorf">Deggendorf 🏙️ Low</option>
+      <option value="dortmund">Dortmund 🏙️ Medium</option>
+      <option value="dresden">Dresden 🏙️ Low-Medium</option>
+      <option value="duisburg">Duisburg 🏙️ Low-Medium</option>
+      <option value="dusseldorf">Düsseldorf 🏙️ Medium-High</option>
+      <option value="erlangen">Erlangen 🏙️ Low-Medium</option>
+      <option value="frankfurt">Frankfurt 🏙️ High Cost</option>
       <option value="fulda">Fulda 🏙️ Low</option>
       <option value="goettingen">Göttingen 🏙️ Low-Medium</option>
-      <option value="hof">Hof 🏙️ Low</option>
-      <option value="lemgo">Lemgo / Detmold 🏙️ Low</option>
-      <option value="schmalkalden">Schmalkalden 🏙️ Low</option>
-      <option value="wolfenbuettel">Wolfenbüttel 🏙️ Low</option>
-      <option value="zwickau">Zwickau 🏙️ Low</option>
-      <option value="potsdam">Potsdam 🏙️ Low-Medium</option>
-      <option value="bielefeld">Bielefeld 🏙️ Low</option>
-      <option value="oldenburg">Oldenburg 🏙️ Low</option>
+      <option value="hamburg">Hamburg 🏙️ Medium-High</option>
       <option value="hildesheim">Hildesheim 🏙️ Low</option>
-      <option value="luneburg">Lüneburg 🏙️ Low</option>
-      <option value="weimar">Weimar 🏙️ Very Low</option>
-      <option value="cottbus">Cottbus 🏙️ Very Low</option>
-      <option value="clausthal">Clausthal-Zellerfeld 🏙️ Very Low</option>
+      <option value="hof">Hof 🏙️ Low</option>
       <option value="ilmenau">Ilmenau 🏙️ Very Low</option>
+      <option value="ingolstadt">Ingolstadt 🏙️ Medium</option>
+      <option value="kaiserslautern">Kaiserslautern 🏙️ Low</option>
+      <option value="karlsruhe">Karlsruhe 🏙️ Medium</option>
+      <option value="koblenz">Koblenz 🏙️ Low-Medium</option>
+      <option value="lemgo">Lemgo / Detmold 🏙️ Low</option>
+      <option value="luneburg">Lüneburg 🏙️ Low</option>
+      <option value="mannheim">Mannheim 🏙️ Medium</option>
+      <option value="marburg">Marburg 🏙️ Low-Medium</option>
+      <option value="munich">Munich (München) 🏙️ High Cost</option>
+      <option value="neuulm">Neu-Ulm / Ulm 🏙️ Low-Medium</option>
       <option value="nordhausen">Nordhausen 🏙️ Very Low</option>
+      <option value="nuremberg">Nuremberg / Erlangen 🏙️ Medium</option>
+      <option value="oldenburg">Oldenburg 🏙️ Low</option>
+      <option value="paderborn">Paderborn 🏙️ Low-Medium</option>
+      <option value="potsdam">Potsdam 🏙️ Low-Medium</option>
+      <option value="schmalkalden">Schmalkalden 🏙️ Low</option>
+      <option value="siegen">Siegen 🏙️ Low</option>
+      <option value="stuttgart">Stuttgart 🏙️ Medium-High</option>
+      <option value="weimar">Weimar 🏙️ Very Low</option>
       <option value="wernigerode">Wernigerode 🏙️ Very Low</option>
+      <option value="wiesbaden">Wiesbaden 🏙️ Medium-High</option>
+      <option value="wolfenbuettel">Wolfenbüttel 🏙️ Low</option>
+      <option value="wuerzburg">Würzburg 🏙️ Low-Medium</option>
+      <option value="zwickau">Zwickau 🏙️ Low</option>
     </select>
+    <div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:10px 14px;background:var(--surface-2);border-radius:var(--r-sm);border:1px solid var(--border)">
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;font-size:.82rem;color:var(--t2);font-weight:600;user-select:none">
+        <input type="checkbox" id="semFeeToggle" onchange="renderCalc()" style="width:16px;height:16px;accent-color:var(--ac);cursor:pointer">
+        Include semester fees in monthly breakdown
+      </label>
+      <span style="font-size:.72rem;color:var(--t4);margin-left:auto">~€140/mo (€280/semester)</span>
+    </div>
     <div id="calcResult"></div>
   </div>
   <div style="font-size:.72rem;color:var(--t4);text-align:center">💡 Estimates based on 2025/26 averages. Actual costs vary — use as planning guide only.</div>
@@ -2219,6 +2283,166 @@ let trackerData = JSON.parse(localStorage.getItem('gmg_tracker')||'{}');
 
 function trackerSave(){ localStorage.setItem('gmg_tracker',JSON.stringify(trackerData)); }
 
+// ─── CGPA CONVERTER ───
+let _cgpaMode = '10'; // '10' | '4' | 'pct'
+
+function setCgpaMode(mode){
+  _cgpaMode = mode;
+  const labels = {'10':'Enter your CGPA (out of 10)','4':'Enter your GPA (out of 4.0)','pct':'Enter your Percentage (%)'};
+  const units  = {'10':'/ 10','4':'/ 4.0','pct':'%'};
+  const maxs   = {'10':10,'4':4,'pct':100};
+  const el = document.getElementById('cgpaInput');
+  if(el){ el.max=maxs[mode]; el.placeholder=mode==='10'?'e.g. 7.5':mode==='4'?'e.g. 3.2':'e.g. 72'; el.value=''; }
+  const lbl=document.getElementById('cgpaInputLabel'); if(lbl) lbl.textContent=labels[mode];
+  const unit=document.getElementById('cgpaInputUnit'); if(unit) unit.textContent=units[mode];
+  // Toggle button styles
+  ['10','4','pct'].forEach(m=>{
+    const id={'10':'cgpaBtn10','4':'cgpaBtn4','pct':'cgpaBtnPct'}[m];
+    const btn=document.getElementById(id);
+    if(!btn) return;
+    if(m===mode){btn.style.background='var(--ac)';btn.style.borderColor='var(--ac)';btn.style.color='#fff';}
+    else{btn.style.background='var(--surface-2)';btn.style.borderColor='var(--border)';btn.style.color='var(--t2)';}
+  });
+  document.getElementById('cgpaResult').style.display='none';
+  calcCgpaConvert();
+}
+
+function _toNorm10(val, mode){
+  // Returns a score out of 10 regardless of input mode
+  if(mode==='10') return val;
+  if(mode==='4')  return (val/4)*10;
+  if(mode==='pct') return val/10;
+  return val;
+}
+
+function _toGermanGrade(score10){
+  // Modified Bavarian formula: G = 1 + 3*(Nmax - Nd) / (Nmax - Nmin)
+  // Nmax=10, Nmin=5 (standard used by most German universities)
+  const nMax=10, nMin=5;
+  if(score10>=nMax) return 1.0;
+  if(score10<=nMin) return 4.0;
+  const g = 1 + 3*(nMax-score10)/(nMax-nMin);
+  return Math.round(g*10)/10;
+}
+
+function calcCgpaConvert(){
+  const input = document.getElementById('cgpaInput');
+  const result= document.getElementById('cgpaResult');
+  if(!input||!result) return;
+  const raw = parseFloat(input.value);
+  if(isNaN(raw)||raw<=0){ result.style.display='none'; return; }
+
+  const maxVal = _cgpaMode==='10'?10:_cgpaMode==='4'?4:100;
+  if(raw>maxVal){ result.innerHTML='<div style="color:#ef4444;font-size:.82rem;padding:10px">⚠️ Value exceeds maximum for selected scale.</div>'; result.style.display='block'; return; }
+
+  const score10 = _toNorm10(raw, _cgpaMode);
+  const pct     = Math.round(score10*10);
+  const gGrade  = _toGermanGrade(score10);
+
+  // Admission outlook based on German grade
+  let outlook, olColor, olBg, programs=[];
+  if(gGrade<=1.5){
+    outlook='🏆 Excellent — Eligible for all programs including TUM, FAU, KIT, TU Darmstadt';
+    olColor='#15803d'; olBg='#f0fdf4';
+    programs=['All 71 programs open','Top TUs: TUM, TU Darmstadt, KIT, FAU, TU Berlin','Elite programs: Uni Augsburg Software Eng, KIT CS','Research tracks at any university'];
+  } else if(gGrade<=2.0){
+    outlook='✅ Very Good — Eligible for most competitive programs';
+    olColor='#1d4ed8'; olBg='#eff6ff';
+    programs=['~95% of programs open','TU Berlin, TUHH, BTU, HHU Düsseldorf, Uni Bonn','FAU AI (need 8.0/10), TU Darmstadt (need 8.0/10) may be borderline','Uni Mannheim, Bielefeld, Potsdam, Oldenburg all accessible'];
+  } else if(gGrade<=2.5){
+    outlook='👍 Good — Eligible for most HS and many research university programs';
+    olColor='#d97706'; olBg='#fffbeb';
+    programs=['~75% of programs open','All HS-level programs (OTH, TH Deggendorf, HS Fulda, HS Aalen etc.)','Research universities with 7.0 CGPA requirement accessible','Avoid: TUM (8.5), TU Darmstadt (8.0), FAU AI (8.0), KIT (8.0)'];
+  } else if(gGrade<=3.0){
+    outlook='⚠️ Satisfactory — HS-level programs are your primary target';
+    olColor='#b45309'; olBg='#fff7ed';
+    programs=['~45% of programs open','Focus on HS programs with 6.0–6.5 CGPA requirement','BTU Cottbus, TH Bingen, Ostfalia, HS Hof, WHZ Zwickau','Write strong SOP explaining academic trajectory'];
+  } else {
+    outlook='❌ Below minimum — Most programs will not consider this grade';
+    olColor='#dc2626'; olBg='#fef2f2';
+    programs=['Very few options — check specific program requirements','Consider bridge programs or language courses first','Some HS programs may consider with strong relevant experience','Consult university international office directly'];
+  }
+
+  const progHTML = programs.map(p=>`<li style="margin-bottom:4px">${p}</li>`).join('');
+
+  // Color for grade display
+  const gradeColor = gGrade<=1.5?'#15803d':gGrade<=2.5?'#1d4ed8':gGrade<=3.0?'#d97706':'#dc2626';
+
+  result.innerHTML=`
+    <div style="border-top:1px solid var(--border);padding-top:18px;margin-top:4px">
+      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:16px">
+        <div style="background:var(--surface-2);border-radius:var(--r-sm);padding:14px;text-align:center">
+          <div style="font-size:.68rem;font-weight:700;color:var(--t4);text-transform:uppercase;margin-bottom:4px">Your Input</div>
+          <div style="font-size:1.6rem;font-weight:900;color:var(--t1)">${raw}</div>
+          <div style="font-size:.7rem;color:var(--t4)">${_cgpaMode==='10'?'/ 10 CGPA':_cgpaMode==='4'?'/ 4.0 GPA':'%'}</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:var(--r-sm);padding:14px;text-align:center">
+          <div style="font-size:.68rem;font-weight:700;color:var(--t4);text-transform:uppercase;margin-bottom:4px">Equiv. CGPA</div>
+          <div style="font-size:1.6rem;font-weight:900;color:var(--t1)">${score10.toFixed(2)}</div>
+          <div style="font-size:.7rem;color:var(--t4)">/ 10.0</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:var(--r-sm);padding:14px;text-align:center">
+          <div style="font-size:.68rem;font-weight:700;color:var(--t4);text-transform:uppercase;margin-bottom:4px">Percentage</div>
+          <div style="font-size:1.6rem;font-weight:900;color:var(--t1)">~${pct}%</div>
+          <div style="font-size:.7rem;color:var(--t4)">approximate</div>
+        </div>
+        <div style="background:var(--surface-2);border-radius:var(--r-sm);padding:14px;text-align:center;border:2px solid ${gradeColor}">
+          <div style="font-size:.68rem;font-weight:700;color:var(--t4);text-transform:uppercase;margin-bottom:4px">German Grade</div>
+          <div style="font-size:2rem;font-weight:900;color:${gradeColor}">${gGrade.toFixed(1)}</div>
+          <div style="font-size:.7rem;color:var(--t4)">/ 4.0 scale</div>
+        </div>
+      </div>
+
+      <div style="background:${olBg};border:1px solid ${olColor}30;border-radius:var(--r-sm);padding:12px 16px;margin-bottom:14px">
+        <div style="font-size:.82rem;font-weight:700;color:${olColor};margin-bottom:8px">${outlook}</div>
+        <ul style="margin:0;padding-left:18px;font-size:.76rem;color:var(--t2);line-height:1.7">${progHTML}</ul>
+      </div>
+
+      <div style="font-size:.72rem;color:var(--t4);padding:8px 12px;background:var(--surface-2);border-radius:var(--r-sm)">
+        🧮 Formula: German Grade = 1 + 3 × (10 − ${score10.toFixed(2)}) / (10 − 5) = <strong style="color:var(--t1)">${gGrade.toFixed(1)}</strong> &nbsp;|&nbsp; Modified Bavarian Formula (anabin standard)
+      </div>
+    </div>`;
+  result.style.display='block';
+}
+
+// Build reference table on section show
+function initCgpaTable(){
+  const tbody = document.getElementById('cgpaRefTable');
+  if(!tbody||tbody.children.length>0) return;
+  const rows=[
+    [9.5,10,'Very High'],
+    [9.0,9.5,'High'],
+    [8.5,9.0,'High'],
+    [8.0,8.5,'High'],
+    [7.5,8.0,'Moderate'],
+    [7.0,7.5,'Moderate'],
+    [6.5,7.0,'Lower'],
+    [6.0,6.5,'Low'],
+    [5.5,6.0,'Very Low'],
+    [5.0,5.5,'Minimum'],
+  ];
+  const outlookMap={
+    'Very High':'🏆 All programs, top TUs','High':'✅ Most programs incl. research TUs',
+    'Moderate':'👍 HS + many uni programs','Lower':'⚠️ HS-focused programs',
+    'Low':'⚠️ Limited HS options','Very Low':'❌ Below most minimums','Minimum':'❌ Almost none'
+  };
+  const gradeLabel={1.0:'Sehr gut (Very Good)',1.5:'Gut (Good)',2.0:'Gut',2.5:'Befriedigend (Satisfactory)',3.0:'Befriedigend',3.5:'Ausreichend (Sufficient)',4.0:'Ausreichend'};
+  tbody.innerHTML=rows.map(([lo,hi,tier],i)=>{
+    const mid=(lo+hi)/2;
+    const g=_toGermanGrade(mid);
+    const gl=g<=1.5?'Sehr gut':g<=2.5?'Gut':g<=3.0?'Befriedigend':'Ausreichend';
+    const gc=g<=1.5?'#15803d':g<=2.5?'#1d4ed8':g<=3.0?'#d97706':'#dc2626';
+    const bg=i%2===0?'':'background:var(--surface-3)';
+    return `<tr style="${bg}">
+      <td style="padding:7px 10px;font-weight:700">${lo.toFixed(1)} – ${hi.toFixed(1)}</td>
+      <td style="padding:7px 10px">${Math.round(lo*10)}–${Math.round(hi*10)}%</td>
+      <td style="padding:7px 10px;font-weight:800;color:${gc}">${g.toFixed(1)}</td>
+      <td style="padding:7px 10px;color:var(--t3)">${gl}</td>
+      <td style="padding:7px 10px">${outlookMap[tier]||''}</td>
+    </tr>`;
+  }).join('');
+}
+
 function trackerInit(){
   const sel=document.getElementById('trackerAddUni');
   if(!sel)return;
@@ -2311,6 +2535,77 @@ function filterCalcCities(q){
     if(first){sel.value=first.value;renderCalc();}
   }
 }
+function printBookmarkComparison(){
+  const bms = JSON.parse(localStorage.getItem('gmg_bookmarks')||'[]');
+  if(!bms.length){alert('No bookmarks yet. Star ★ programs on cards first.');return;}
+  const list = bms.map(key=>{
+    const [uni,title]=key.split('||');
+    return courses.find(c=>c.uni===uni&&c.title===title);
+  }).filter(Boolean);
+  if(!list.length){alert('Bookmarked programs not found in course data.');return;}
+
+  const catLabels={ai:'AI/ML',ds:'Data Science',cs:'Computer Science',iot:'IoT/Embedded',cyber:'Cybersecurity',web:'Web/Software',mgmt:'Management IT',eng:'Engineering'};
+  const diffLabel={easy:'Beginner-Friendly',mid:'Intermediate',hard:'Advanced'};
+
+  const colW = Math.min(220, Math.floor(900/list.length));
+
+  const headerCells = list.map(p=>`
+    <th style="background:#1c1008;color:#fff;padding:10px 8px;font-size:11px;text-align:left;vertical-align:top;min-width:${colW}px;border-right:1px solid #333">
+      <div style="font-size:10px;opacity:.7;margin-bottom:3px">${p.uni}</div>
+      <div style="font-size:12px;font-weight:800;line-height:1.3">${p.title}</div>
+    </th>`).join('');
+
+  const rows = [
+    ['📍 City',        p=>p.city],
+    ['🏷️ Category',   p=>catLabels[p.cat]||p.cat],
+    ['🌐 Language',   p=>p.lang==='english'?'🇬🇧 English Only':p.lang==='german'?'🇩🇪 German Required':'🔀 EN/DE'],
+    ['💰 Salary',     p=>p.salary+'/yr'],
+    ['🎓 Min CGPA',   p=>p.cgpa],
+    ['📊 IELTS',      p=>p.ielts],
+    ['📅 Intake',     p=>p.intake],
+    ['💳 Sem. Fee',   p=>p.semFee],
+    ['⚡ Difficulty',  p=>diffLabel[p.diff]||p.diff],
+    ['🔬 Orientation',p=>p.orientation],
+    ['💻 Coding',     p=>`${p.coding}/100`],
+    ['📐 Math',       p=>`${p.math}/100`],
+    ['🏆 Job Score',  p=>`${p.job}/100`],
+    ['📅 SS27 Deadline',p=>p.deadline2027s||'Check site'],
+    ['🎯 Career',     p=>p.career],
+    ['🌐 Link',       p=>`<a href="${p.url}" style="color:#c06030;font-size:10px">Official Site ↗</a>`],
+  ].map(([label,fn],ri)=>{
+    const cells = list.map(p=>`<td style="padding:7px 8px;font-size:11px;vertical-align:top;border-right:1px solid #e5e7eb;border-bottom:1px solid #e5e7eb">${fn(p)}</td>`).join('');
+    const bg = ri%2===0?'#ffffff':'#f9f5f2';
+    return `<tr style="background:${bg}"><th style="padding:7px 8px;font-size:10px;font-weight:700;color:#6b4c30;text-align:left;white-space:nowrap;background:${bg};border-bottom:1px solid #e5e7eb;border-right:2px solid #c06030">${label}</th>${cells}</tr>`;
+  }).join('');
+
+  const noteRow = list.map(p=>`<td style="padding:8px;font-size:10px;color:#555;vertical-align:top;border-right:1px solid #e5e7eb">🇮🇳 ${p.indiaNote}</td>`).join('');
+
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8">
+  <title>Germany Masters — Bookmarked Programs Comparison</title>
+  <style>
+    body{font-family:Arial,sans-serif;margin:20px;color:#111;font-size:12px}
+    h1{font-size:16px;margin-bottom:2px;color:#1c1008}
+    p{font-size:11px;color:#888;margin-bottom:12px}
+    table{width:100%;border-collapse:collapse;border:1px solid #e5e7eb}
+    @media print{@page{margin:10mm;size:landscape}body{margin:0}}
+  </style></head>
+  <body>
+  <h1>🇩🇪 Germany Masters — Bookmarked Programs Comparison Sheet</h1>
+  <p>Generated ${new Date().toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})} · ${list.length} program${list.length>1?'s':''} · Print in Landscape for best results</p>
+  <table>
+    <thead><tr><th style="background:#1c1008;color:#fff;padding:10px 8px;font-size:10px;text-align:left;min-width:110px;border-right:2px solid #c06030">Field</th>${headerCells}</tr></thead>
+    <tbody>
+      ${rows}
+      <tr style="background:#fff8f0"><th style="padding:8px;font-size:10px;font-weight:700;color:#6b4c30;text-align:left;border-right:2px solid #c06030;border-bottom:1px solid #e5e7eb">🇮🇳 For Indians</th>${noteRow}</tr>
+    </tbody>
+  </table>
+  <p style="margin-top:10px">Always verify deadlines and requirements on official university websites before applying.</p>
+  </body></html>`;
+  const w=window.open('','_blank');
+  w.document.write(html);w.document.close();
+  setTimeout(()=>w.print(),500);
+}
+
 function renderCalc(){
   const city = document.getElementById('calcCity').value;
   // Data: accurate 2025/26 based on WG-gesucht, DAAD, Studierendenwerk, Moses Mendelssohn Institute reports
@@ -2369,7 +2664,9 @@ function renderCalc(){
     wernigerode:  {rent:330,food:175,transport:57,insurance:120,misc:43,note:"Harz mountains. WG avg ~€330. Among Germany\'s cheapest student cities. (Moses Mendelssohn 2025)"}
   };
   const d = data[city] || data.berlin;
-  const total = d.rent+d.food+d.transport+d.insurance+d.misc;
+  const semToggle = document.getElementById('semFeeToggle');
+  const semMonthly = (semToggle && semToggle.checked) ? 140 : 0;
+  const total = d.rent+d.food+d.transport+d.insurance+d.misc+semMonthly;
   const bar = (v,max,col)=>`<div style="height:8px;border-radius:4px;background:var(--surface-3);margin-top:4px"><div style="height:8px;border-radius:4px;background:${col};width:${Math.round(v/max*100)}%"></div></div>`;
   const maxV = Math.max(d.rent,d.food,d.transport,d.insurance,d.misc)*1.1;
   const row = (label,val,col,icon)=>`<div style="margin-bottom:12px"><div style="display:flex;justify-content:space-between;font-size:.82rem"><span style="color:var(--t2)">${icon} ${label}</span><span style="font-weight:700;color:var(--t1)">€${val}/mo</span></div>${bar(val,maxV,col)}</div>`;
@@ -2413,6 +2710,7 @@ function renderCalc(){
       ${row('Transport (semester ticket)',d.transport,'#f59e0b','🚌')}
       ${row('Health Insurance (TK/AOK)',d.insurance,'#ef4444','🏥')}
       ${row('Misc (phone, books, leisure)',d.misc,'#8b5cf6','📱')}
+      ${semMonthly>0?row('Semester Fee (÷6 months)',semMonthly,'#0ea5e9','🎓'):''}
       <div style="border-top:2px solid var(--border);margin-top:16px;padding-top:14px;display:flex;justify-content:space-between;align-items:center">
         <span style="font-size:.85rem;font-weight:700;color:var(--t2)">💸 Monthly Total</span>
         <span style="font-size:1.4rem;font-weight:800;color:var(--ac)">€${total}/mo</span>
@@ -3664,6 +3962,7 @@ renderCourses();
 renderCities();
 renderCalc();
 trackerInit();
+initCgpaTable();
 renderCareers();
 renderScholarships();
 renderChecklist();
